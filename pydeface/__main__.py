@@ -49,7 +49,7 @@ def main():
         help="If not provided adds '_defaced' suffix.")
 
     parser.add_argument(
-        "--force", action='store_true',
+        "--overwrite", action='store_true',
         help="Force to rewrite the output even if it exists.")
 
     parser.add_argument(
@@ -109,7 +109,7 @@ def main():
                 outdata = applyfile_data * tmpdata
             applyfile_img = Nifti1Image(outdata, applyfile_img.affine,
                                         applyfile_img.header)
-            outfile = pdu.output_checks(applyfile, force=args.force)
+            outfile = pdu.output_checks(applyfile, overwrite=args.force)
             applyfile_img.to_filename(outfile)
             print('  %s' % applyfile)
 

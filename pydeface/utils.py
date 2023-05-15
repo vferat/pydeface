@@ -2,13 +2,15 @@
 
 import os
 import shutil
-import sys
+import logging
+
 from pkg_resources import resource_filename, Requirement
 import tempfile
 import numpy as np
 from nipype.interfaces import fsl
 from nibabel import load, Nifti1Image
 
+from ._checks import _check_type
 
 def initial_checks(template=None, facemask=None):
     """Initial sanity checks."""
@@ -27,24 +29,21 @@ def initial_checks(template=None, facemask=None):
     if 'FSLDIR' not in os.environ:
         raise Exception("FSL must be installed and "
                         "FSLDIR environment variable must be defined.")
-        sys.exit(2)
     return template, facemask
 
 
-def output_checks(infile, outfile=None, force=False):
+def output_checks(infile, outfile=None, overwrite=False):
     """Determine output file name."""
-    if force is None:
-        force = False
+    _check_type(overwrite, bool)
     if outfile is None:
         outfile = infile.replace('.nii', '_defaced.nii')
 
-    if os.path.exists(outfile) and force:
-        print('Previous output will be overwritten.')
-    elif os.path.exists(outfile):
-        raise Exception("%s already exists. Remove it first or use '--force' "
-                        "flag to overwrite." % outfile)
-    else:
-        pass
+    if os.path.exists(outfile):
+        if overwrite:
+            logging.warn('Previous output will be overwritten.')
+        else:
+            raise Exception("%s already exists. Remove it first or use '--overwrite' "
+                            "flag to overwrite." % outfile)
     return outfile
 
 
